@@ -10,6 +10,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { ConfigModule } from '@nestjs/config';
 
+//Entities
+import { Restaurant } from './restaurants/entities/restarant.entity';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,8 +35,10 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      synchronize: true,
-      logging: true,
+      // Is Option that TypeOrm find entity and migration itself
+      synchronize: process.env.NODE_ENV !== `prod`,
+      logging: process.env.NODE_ENV !== `prod`,
+      entities: [Restaurant],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
