@@ -11,3 +11,5 @@ Active Record : access DB in Model, using small project
 Data Mapper : access DB using repository, help maintainability using large app
 Repository is a class that define all query, method and conduct CURD object also, can use it many ways like testing
 In this project using Data Mapper pattern
+
+Using Mapped Type to handle entity with dtos

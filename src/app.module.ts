@@ -36,8 +36,8 @@ import { Restaurant } from './restaurants/entities/restarant.entity';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       // Is Option that TypeOrm find entity and migration itself
-      synchronize: process.env.NODE_ENV !== `prod`,
-      logging: process.env.NODE_ENV !== `prod`,
+      synchronize: process.env.NODE_ENV === `prod`,
+      logging: true,
       entities: [Restaurant],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
