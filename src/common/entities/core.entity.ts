@@ -2,13 +2,13 @@ import { Field } from '@nestjs/graphql';
 import {
   CreateDateColumn,
   Entity,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class CoreEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   @Field((type) => Number)
   id: number;
 

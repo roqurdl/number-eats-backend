@@ -14,7 +14,7 @@ import { CommonModule } from './common/common.module';
 
 //Entities
 import { Restaurant } from './restaurants/entities/restarant.entity';
-import { User } from './users/entities/users.entity';
+import { Users } from './users/entities/users.entity';
 
 @Module({
   imports: [
@@ -39,16 +39,15 @@ import { User } from './users/entities/users.entity';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       // Is Option that TypeOrm find entity and migration itself
-      synchronize: process.env.NODE_ENV === `prod`,
+      synchronize: true,
       logging: true,
-      entities: [User],
+      entities: [Users],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
       sortSchema: true,
     }),
-    RestaurantsModule,
     UsersModule,
     CommonModule,
   ],
