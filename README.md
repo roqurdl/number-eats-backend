@@ -13,3 +13,22 @@ Repository is a class that define all query, method and conduct CURD object also
 In this project using Data Mapper pattern
 
 Using Mapped Type to handle entity with dtos
+
+## User Model:"
+
+-id
+-createAt
+-updatedAt
+
+-email
+-password
+-role(client|owner|delivery)
+
+## User CURD:
+
+-Create Account
+-Log In
+-See Profile
+-Edit Profile
+-Delete Account
+-Verify Email

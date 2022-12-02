@@ -9,9 +9,12 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
+import { CommonModule } from './common/common.module';
 
 //Entities
 import { Restaurant } from './restaurants/entities/restarant.entity';
+import { User } from './users/entities/users.entity';
 
 @Module({
   imports: [
@@ -38,7 +41,7 @@ import { Restaurant } from './restaurants/entities/restarant.entity';
       // Is Option that TypeOrm find entity and migration itself
       synchronize: process.env.NODE_ENV === `prod`,
       logging: true,
-      entities: [Restaurant],
+      entities: [User],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -46,6 +49,8 @@ import { Restaurant } from './restaurants/entities/restarant.entity';
       sortSchema: true,
     }),
     RestaurantsModule,
+    UsersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
