@@ -40,7 +40,7 @@ export class UserResolver {
         loginInput,
       );
       return {
-        confirm: true,
+        confirm,
         error,
         token,
       };
