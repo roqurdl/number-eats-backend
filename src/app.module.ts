@@ -4,7 +4,12 @@
 import * as Joi from 'joi';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
@@ -14,6 +19,8 @@ import { CommonModule } from './common/common.module';
 //Entities
 import { Users } from './users/entities/users.entity';
 import { JwtModule } from './jwt/jwt.module';
+import { JwtMiddleware } from './jwt/jwt.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -40,19 +47,27 @@ import { JwtModule } from './jwt/jwt.module';
       database: process.env.DB_DATABASE,
       // Is Option that TypeOrm find entity and migration itself
       synchronize: process.env.NODE_ENV === `prod`,
-      logging: process.env.NODE_ENV === `prod`,
+      logging: true,
       entities: [Users],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      context: ({ req }) => ({ user: req['user'] }),
       autoSchemaFile: true,
       sortSchema: true,
     }),
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
     UsersModule,
     CommonModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes({ path: `/graphql`, method: RequestMethod.POST });
+  }
+}

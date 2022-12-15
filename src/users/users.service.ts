@@ -38,8 +38,8 @@ export class UserService {
       if (!user) {
         return { confirm: false, error: `User is not found.` };
       }
-      const check = await user.hashCheck(password);
-      if (!check) {
+      const pwCheck = await user.hashCheck(password);
+      if (!pwCheck) {
         return { confirm: false, error: `You enter the Wrong Password` };
       }
       const token = this.jwtService.sign({ id: user.id });
@@ -50,5 +50,8 @@ export class UserService {
     } catch (error) {
       return { confirm: false, error };
     }
+  }
+  async findById(id: number): Promise<Users> {
+    return this.users.findOneBy({ id });
   }
 }
