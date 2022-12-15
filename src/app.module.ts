@@ -58,8 +58,6 @@ import { AuthModule } from './auth/auth.module';
     }),
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
     UsersModule,
-    CommonModule,
-    AuthModule,
   ],
   controllers: [],
   providers: [],
