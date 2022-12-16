@@ -5,6 +5,7 @@ import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login-account.dto';
 import { Users } from './entities/users.entity';
 import { JwtService } from 'src/jwt/jwt.service';
+import { EditProfileInput } from './dtos/edit-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -53,5 +54,18 @@ export class UserService {
   }
   async findById(id: number): Promise<Users> {
     return this.users.findOneBy({ id });
+  }
+  async editProfile(
+    userId: number,
+    { email, password }: EditProfileInput,
+  ): Promise<Users> {
+    const user = await this.findById(userId);
+    if (email) {
+      user.email = email;
+    }
+    if (password) {
+      user.password = password;
+    }
+    return this.users.save(user);
   }
 }
