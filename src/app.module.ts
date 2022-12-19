@@ -21,6 +21,7 @@ import { Users } from './users/entities/users.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { AuthModule } from './auth/auth.module';
+import { Verification } from './users/entities/verification.entity';
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { AuthModule } from './auth/auth.module';
       // Is Option that TypeOrm find entity and migration itself
       synchronize: process.env.NODE_ENV === `prod`,
       logging: true,
-      entities: [Users],
+      entities: [Users, Verification],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
