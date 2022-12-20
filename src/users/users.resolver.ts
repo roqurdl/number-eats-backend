@@ -29,8 +29,8 @@ export class UserResolver {
 
   @Mutation((returns) => LoginOutput)
   async login(@Args(`input`) loginInput: LoginInput): Promise<LoginOutput> {
-    const { ok, error } = await this.usersService.login(loginInput);
-    return { ok, error };
+    const { ok, error, token } = await this.usersService.login(loginInput);
+    return { ok, error, token };
   }
 
   @Query((returns) => Users)
@@ -48,6 +48,7 @@ export class UserResolver {
   }
 
   @Mutation((returns) => EditProfileOutput)
+  @UseGuards(AuthGuard)
   async editProfile(
     @AuthUser() authUser: Users,
     @Args('input') editProfileInput: EditProfileInput,
