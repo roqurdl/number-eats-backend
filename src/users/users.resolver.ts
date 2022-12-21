@@ -53,11 +53,7 @@ export class UserResolver {
     @AuthUser() authUser: Users,
     @Args('input') editProfileInput: EditProfileInput,
   ) {
-    const { ok, error } = await this.usersService.editProfile(
-      authUser.id,
-      editProfileInput,
-    );
-    return { ok, error };
+    return await this.usersService.editProfile(authUser.id, editProfileInput);
   }
 
   @Mutation((returns) => VerifyEmailOutput)

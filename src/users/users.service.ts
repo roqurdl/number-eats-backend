@@ -91,6 +91,7 @@ export class UserService {
     { email, password }: EditProfileInput,
   ): Promise<EditProfileOutput> {
     const user = await this.users.findOneBy({ id: userId });
+    console.log(user);
     try {
       if (email) {
         user.email = email;
