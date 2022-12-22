@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing';
+import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { EmailService } from 'src/email/email.service';
 import { JwtService } from 'src/jwt/jwt.service';
@@ -6,28 +7,24 @@ import { Users } from './entities/users.entity';
 import { Verification } from './entities/verification.entity';
 import { UserService } from './users.service';
 
-const usersRepository = {
+const mockRepository = {
   findOne: jest.fn(),
-  findOneBy: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
 };
-const verfiRepository = {
-  findOne: jest.fn(),
-  delete: jest.fn(),
-  save: jest.fn(),
-  create: jest.fn(),
-};
-const jwtRepository = {
+const mockJwtService = {
   sign: jest.fn(),
-  verifyToken: jest.fn(),
+  verify: jest.fn(),
 };
-const emailRepository = {
+const mockMailService = {
   sendVerificationEmail: jest.fn(),
 };
 
+type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+
 describe(`UserService`, () => {
   let service: UserService;
+  let usersRepository: MockRepository<Users>;
 
   beforeAll(async () => {
     const modules = await Test.createTestingModule({
@@ -35,30 +32,48 @@ describe(`UserService`, () => {
         UserService,
         {
           provide: getRepositoryToken(Users),
-          useValue: usersRepository,
+          useValue: mockRepository,
         },
         {
           provide: getRepositoryToken(Verification),
-          useValue: verfiRepository,
+          useValue: mockRepository,
         },
         {
           provide: JwtService,
-          useValue: jwtRepository,
+          useValue: mockJwtService,
         },
         {
           provide: EmailService,
-          useValue: emailRepository,
+          useValue: mockMailService,
         },
       ],
     }).compile();
     service = modules.get<UserService>(UserService);
+    usersRepository = modules.get(getRepositoryToken(Users));
   });
 
   it(`should be defined`, () => {
     expect(service).toBeDefined();
   });
 
-  it.todo(`createAccount`);
+  describe('createAccount', () => {
+    it('should fail if user exists', async () => {
+      usersRepository.findOne.mockResolvedValue({
+        id: 1,
+        email: '',
+      });
+      const result = await service.createAccount({
+        email: '',
+        password: '',
+        role: 0,
+      });
+      expect(result).toMatchObject({
+        ok: false,
+        error: 'This email already used.',
+      });
+    });
+  });
+
   it.todo(`login`);
   it.todo(`findById`);
   it.todo(`editProfile`);

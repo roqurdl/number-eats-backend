@@ -71,7 +71,7 @@ export class UserService {
   }
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const user = await this.users.findOneBy({ id });
+      const user = await this.users.findOne({ where: { id } });
       if (!user) {
         throw Error();
       }
@@ -90,7 +90,7 @@ export class UserService {
     userId: number,
     { email, password }: EditProfileInput,
   ): Promise<EditProfileOutput> {
-    const user = await this.users.findOneBy({ id: userId });
+    const user = await this.users.findOne({ where: { id: userId } });
     console.log(user);
     try {
       if (email) {
