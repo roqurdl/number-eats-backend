@@ -88,11 +88,11 @@ export class UserService {
     { email, password }: EditProfileInput,
   ): Promise<EditProfileOutput> {
     const user = await this.users.findOne({ where: { id: userId } });
-    console.log(user);
     try {
       if (email) {
         user.email = email;
         user.verified = false;
+
         const verification = await this.verifications.save(
           this.verifications.create({ user }),
         );
@@ -108,7 +108,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: 'Could not update profile.',
       };
     }
   }
