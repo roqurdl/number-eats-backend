@@ -164,15 +164,9 @@ describe(`UserService`, () => {
     });
 
     it('should fail on exception', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
       const result = await service.login(loginArgs);
-      try {
-        usersRepository.findOne.mockRejectedValue(new Error());
-      } catch (error) {
-        expect(result).toEqual({
-          ok: false,
-          error,
-        });
-      }
+      expect(result).toEqual({ ok: false, error: `Could not login` });
     });
   });
 
@@ -260,5 +254,43 @@ describe(`UserService`, () => {
     });
   });
 
-  it.todo(`verifyEmail`);
+  describe(`verifyEmail`, () => {
+    it(`should verifiy the email`, async () => {
+      const mockedVerifi = {
+        user: {
+          verified: false,
+        },
+        id: 6,
+      };
+      verfiRepository.findOne.mockResolvedValue(mockedVerifi);
+      const result = await service.verifyEmail('');
+
+      expect(verfiRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(verfiRepository.findOne).toHaveBeenCalledWith({
+        relations: expect.any(Object),
+        where: expect.any(Object),
+      });
+
+      expect(usersRepository.save).toHaveBeenCalledTimes(1);
+      expect(usersRepository.save).toHaveBeenCalledWith({ verified: true });
+
+      expect(verfiRepository.delete).toHaveBeenCalledTimes(1);
+      expect(verfiRepository.delete).toHaveBeenCalledWith(mockedVerifi.id);
+
+      expect(result).toEqual({ ok: true });
+    });
+    it(`should fail verification`, async () => {
+      verfiRepository.findOne.mockResolvedValue(undefined);
+      const result = await service.verifyEmail('');
+      expect(result).toEqual({ ok: false, error: 'Verification not found.' });
+    });
+    it('should fail on exception', async () => {
+      verfiRepository.findOne.mockResolvedValue(new Error());
+      const result = await service.verifyEmail(``);
+      expect(result).toEqual({
+        ok: false,
+        error: `Could not verify email`,
+      });
+    });
+  });
 });

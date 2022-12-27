@@ -66,7 +66,7 @@ export class UserService {
         token,
       };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: `Could not login` };
     }
   }
   async findById(id: number): Promise<UserProfileOutput> {
@@ -129,7 +129,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: `Could not verify email`,
       };
     }
   }
