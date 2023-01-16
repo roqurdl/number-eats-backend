@@ -25,10 +25,10 @@ describe('UserModule (e2e)', () => {
     const options: DataSourceOptions = {
       type: 'postgres',
       database: 'number-eats-test',
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
+      host: `172.28.192.1`,
+      port: 5432,
+      username: `rolph`,
+      password: `381858`,
       entities: [Users, Verification],
     };
     const dataSource = new DataSource(options);
@@ -37,11 +37,11 @@ describe('UserModule (e2e)', () => {
     await dataSource.dropDatabase();
     await dataSource.destroy();
     await app.close();
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({});
-      }, 2000);
-    });
+    // await new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve({});
+    //   }, 2000);
+    // });
   });
   describe('createAccount', () => {
     const EMAIL = 'nico@las.com';
