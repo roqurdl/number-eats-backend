@@ -7,16 +7,18 @@ import { Users } from 'src/users/entities/users.entity';
 import { Verification } from 'src/users/entities/verification.entity';
 
 const GRAPHQL_ENDPOINT = '/graphql';
-jest.setTimeout(40000);
-
+jest.mock('got', () => {
+  return {
+    post: jest.fn(),
+  };
+});
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
-
+  jest.setTimeout(30000);
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-
     app = module.createNestApplication();
     await app.init();
   });
@@ -34,17 +36,13 @@ describe('UserModule (e2e)', () => {
     const dataSource = new DataSource(options);
     await dataSource.initialize();
     await dataSource.driver.connect();
+    await new Promise((resolve) => setTimeout(() => resolve({}), 10000));
     await dataSource.dropDatabase();
     await dataSource.destroy();
     await app.close();
-    // await new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve({});
-    //   }, 2000);
-    // });
   });
   describe('createAccount', () => {
-    const EMAIL = 'nico@las.com';
+    const EMAIL = 'test@email.com';
     it('should create account', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
@@ -53,8 +51,8 @@ describe('UserModule (e2e)', () => {
           mutation {
             createAccount(input: {
               email:"${EMAIL}",
-              password:"123123",
-              role:Client
+              password:"12345",
+              role:Owner
             }) {
               ok
               error
@@ -69,7 +67,31 @@ describe('UserModule (e2e)', () => {
         });
     });
 
-    it.todo('should fail if account already exists');
+    it('should fail if account already exists', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+          mutation {
+            createAccount(input: {
+              email:"${EMAIL}",
+              password:"12345",
+              role:Owner
+            }) {
+              ok
+              error
+            }
+          }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.createAccount.ok).toBe(false);
+          expect(res.body.data.createAccount.error).toBe(
+            'This email already used.',
+          );
+        });
+    });
   });
   it.todo('userProfile');
   it.todo('login');
