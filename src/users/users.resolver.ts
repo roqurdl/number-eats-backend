@@ -41,10 +41,10 @@ export class UserResolver {
 
   @Query((returns) => UserProfileOutput)
   async userProfile(@Args() userProfileInput: UserProfileInput) {
-    const { ok, error } = await this.usersService.findById(
+    const { ok, error, user } = await this.usersService.findById(
       userProfileInput.userId,
     );
-    return { ok, error };
+    return { ok, error, user };
   }
 
   @Mutation((returns) => EditProfileOutput)
