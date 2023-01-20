@@ -21,6 +21,9 @@ import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { Verification } from './users/entities/verification.entity';
 import { EmailModule } from './email/email.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
+import { Restaurant } from './restaurants/entities/restarant.entity';
+import { Category } from './restaurants/entities/category.entity';
 
 @Module({
   imports: [
@@ -51,7 +54,7 @@ import { EmailModule } from './email/email.module';
       // Is Option that TypeOrm find entity and migration itself
       synchronize: true,
       logging: true,
-      entities: [Users, Verification],
+      entities: [Users, Verification, Restaurant, Category],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -66,6 +69,7 @@ import { EmailModule } from './email/email.module';
       domain: process.env.MAILGUN_DOMAIN_NAME,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
     }),
+    RestaurantsModule,
   ],
   controllers: [],
   providers: [],
