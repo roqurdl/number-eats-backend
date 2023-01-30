@@ -36,6 +36,8 @@ export class Restaurant {
   category: Category;
 
   @Field((type) => Users)
-  @ManyToOne((type) => Users, (user) => user.restaurants)
+  @ManyToOne((type) => Users, (user) => user.restaurants, {
+    onDelete: 'CASCADE',
+  })
   owner: Users;
 }
