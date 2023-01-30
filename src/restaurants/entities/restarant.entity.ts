@@ -23,6 +23,11 @@ export class Restaurant {
   @IsString()
   address: string;
 
+  @Field((type) => String)
+  @Column()
+  @IsString()
+  coverImg: string;
+
   @Field((type) => Category, { nullable: true })
   @ManyToOne((type) => Category, (category) => category, {
     nullable: true,

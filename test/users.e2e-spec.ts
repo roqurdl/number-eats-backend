@@ -46,7 +46,7 @@ describe('UserModule (e2e)', () => {
     const options: DataSourceOptions = {
       type: 'postgres',
       database: 'number-eats-test',
-      host: `172.28.144.1`,
+      host: `172.17.128.1`,
       port: 5432,
       username: `rolph`,
       password: `381858`,
