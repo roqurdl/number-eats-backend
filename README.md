@@ -24,7 +24,7 @@ Using Mapped Type to handle entity with dtos
 -password
 -role(client|owner|delivery)
 
-## User CURD:
+## User CRUD:
 
 -Create Account
 -Log In
@@ -32,3 +32,8 @@ Using Mapped Type to handle entity with dtos
 -Edit Profile
 -Delete Account
 -Verify Email
+
+## Restaurant CRUD:
+
+typeorm @EntityRepository를 활용한 editRestaurant 작업에서 EntityRepository is deprecated.
+@CustomRepository로 대체
