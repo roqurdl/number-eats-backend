@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { TYPEORM_EX_CUSTOM_REPOSITORY } from './typeorm-ex.decorator';
 
 export class TypeOrmExModule {
-  public static CustomRepository<T extends new (...args: any[]) => any>(
+  public static forCustomRepository<T extends new (...args: any[]) => any>(
     repositories: T[],
   ): DynamicModule {
     const providers: Provider[] = [];
