@@ -13,6 +13,10 @@ import {
   EditRestaurantOutput,
 } from './dtos/edit-restaurants.dto';
 import { CategoryRepository } from './repository/category.repository';
+import {
+  DeleteRestaurantInput,
+  DeleteRestaurantOutput,
+} from './dtos/delete-restaurants.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -23,16 +27,17 @@ export class RestaurantService {
     private readonly categories: CategoryRepository,
   ) {}
 
-  async getOrCreate(name: string): Promise<Category> {
-    const categoryName = name.trim().toLowerCase();
-    const categorySlug = categoryName.replace(/ /g, '-');
-    let category = await this.categories.findOneBy({ slug: categorySlug });
-    if (!category) {
-      category = await this.categories.save(
-        this.categories.create({ slug: categorySlug, name: categoryName }),
-      );
+  async CheckRestaurant(owner: Users, id: number, type: string) {
+    const restarant = await this.restaurants.findOneBy({ id });
+    if (!restarant) {
+      return { ok: false, error: `Restaurant is not found.` };
     }
-    return category;
+    if (owner.id !== restarant.ownerId) {
+      return {
+        ok: false,
+        error: `You can not ${type} restarant.`,
+      };
+    }
   }
 
   async createRestaurant(
@@ -62,16 +67,15 @@ export class RestaurantService {
     editRestaurantInput: EditRestaurantInput,
   ): Promise<EditRestaurantOutput> {
     try {
-      const restarant = await this.restaurants.findOneBy({
-        id: editRestaurantInput.restaurantId,
-      });
-      if (!restarant) {
-        return { ok: false, error: `Restaurant is not found.` };
-      }
-      if (owner.id !== restarant.ownerId) {
+      const dbCheck = await this.CheckRestaurant(
+        owner,
+        editRestaurantInput.restaurantId,
+        `edit`,
+      );
+      if (!dbCheck) {
         return {
           ok: false,
-          error: `You can not edit profile.`,
+          error: `There is unknown error in database.`,
         };
       }
       let category: Category = null;
@@ -94,6 +98,27 @@ export class RestaurantService {
       return {
         ok: true,
         error: `Could not edit profile.`,
+      };
+    }
+  }
+  async deleteRestaurant(
+    owner: Users,
+    { restaurantId }: DeleteRestaurantInput,
+  ): Promise<DeleteRestaurantOutput> {
+    try {
+      const dbCheck = await this.CheckRestaurant(owner, restaurantId, `delete`);
+      if (!dbCheck) {
+        return {
+          ok: false,
+          error: `There is unknown error in database.`,
+        };
+      }
+      await this.restaurants.delete(restaurantId);
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        error: `Could not delete Restaurant`,
       };
     }
   }
