@@ -17,13 +17,15 @@ import {
   DeleteRestaurantInput,
   DeleteRestaurantOutput,
 } from './dtos/delete-restaurants.dto';
+import { AllCategoriesOutput } from './dtos/all-category.dto';
+import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurant.dto';
 
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
-    @InjectRepository(Category)
     private readonly categories: CategoryRepository,
   ) {}
 
@@ -119,6 +121,81 @@ export class RestaurantService {
       return {
         ok: false,
         error: `Could not delete Restaurant`,
+      };
+    }
+  }
+
+  async allCategories(): Promise<AllCategoriesOutput> {
+    try {
+      const categories = await this.categories.find();
+      return { ok: true, categories: categories };
+    } catch {
+      return {
+        ok: false,
+        error: `Could not load categories`,
+      };
+    }
+  }
+  countRestaurants(category: Category) {
+    return this.restaurants.count({
+      where: {
+        category: {
+          id: category.id,
+        },
+      },
+    });
+  }
+  async findCategoryBySlug({
+    slug,
+    page,
+  }: CategoryInput): Promise<CategoryOutput> {
+    try {
+      const category = await this.categories.findOne({
+        where: {
+          slug: slug,
+        },
+      });
+      if (!category) {
+        return {
+          ok: false,
+          error: 'Category not found',
+        };
+      }
+      const restaurants = await this.restaurants.find({
+        where: { category: { id: category.id } },
+        take: 25,
+        skip: (page - 1) * 25,
+      });
+      category.restaurant = restaurants;
+      const totalResults = await this.countRestaurants(category);
+      return {
+        ok: true,
+        category,
+        restaurants,
+        totalPages: Math.ceil(totalResults / 25),
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not load category',
+      };
+    }
+  }
+  async allRestaurants({ page }: RestaurantsInput): Promise<RestaurantsOutput> {
+    try {
+      const [restaurants, totalResults] = await this.restaurants.findAndCount({
+        relations: ['category'],
+      });
+      return {
+        ok: true,
+        results: restaurants,
+        totalPages: Math.ceil(totalResults / 25),
+        totalResults,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not load restaurants',
       };
     }
   }
