@@ -25,6 +25,9 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Restaurant } from './restaurants/entities/restarant.entity';
 import { Category } from './restaurants/entities/category.entity';
 import { Dish } from './restaurants/entities/dish.entity';
+import { OrdersModule } from './orders/orders.module';
+import { Order } from './orders/entities/order.entity';
+import { OrderItem } from './orders/entities/order-items.entity';
 
 @Module({
   imports: [
@@ -55,7 +58,15 @@ import { Dish } from './restaurants/entities/dish.entity';
       // Is Option that TypeOrm find entity and migration itself
       synchronize: true,
       logging: true,
-      entities: [Users, Verification, Restaurant, Category, Dish],
+      entities: [
+        Users,
+        Verification,
+        Restaurant,
+        Category,
+        Dish,
+        Order,
+        OrderItem,
+      ],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -71,6 +82,7 @@ import { Dish } from './restaurants/entities/dish.entity';
     }),
     UsersModule,
     RestaurantsModule,
+    OrdersModule,
   ],
   controllers: [],
   providers: [],
