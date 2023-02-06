@@ -25,12 +25,24 @@ import {
   SearchRestaurantInput,
   SearchRestaurantOutput,
 } from './dtos/search-restaurant.dto';
+import { Dish } from './entities/dish.entity';
+import {
+  CreateDishesInput,
+  CreateDishesOutput,
+} from './dtos/create-dishes.dto';
+import {
+  DeleteDishesInput,
+  DeleteDishesOutput,
+} from './dtos/delete-dishes.dto';
+import { EditDishesInput, EditDishesOutput } from './dtos/edit-dishes.dto';
 
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
+    @InjectRepository(Dish)
+    private readonly dishes: Repository<Dish>,
     private readonly categories: CategoryRepository,
   ) {}
 
@@ -245,6 +257,96 @@ export class RestaurantService {
         ok: false,
         error: `Could not search for Restaurants.`,
       };
+    }
+  }
+  async createDish(
+    owner: Users,
+    createDishInput: CreateDishesInput,
+  ): Promise<CreateDishesOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne({
+        where: { id: createDishInput.restaurantId },
+      });
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: `There is no Restaurant ID:${createDishInput.restaurantId}`,
+        };
+      }
+      if (owner.id !== restaurant.ownerId) {
+        return {
+          ok: false,
+          error: `You are not owner of this Restaurant`,
+        };
+      }
+      await this.dishes.save(
+        this.dishes.create({ ...createDishInput, restaurant }),
+      );
+      return { ok: true };
+    } catch (e) {
+      console.log(e);
+      return {
+        ok: false,
+        error: 'Could not create dish',
+      };
+    }
+  }
+  async editDish(
+    owner: Users,
+    editDishInput: EditDishesInput,
+  ): Promise<EditDishesOutput> {
+    try {
+      const dish = await this.dishes.findOne({
+        where: { id: editDishInput.dishId },
+      });
+      if (!dish) {
+        return {
+          ok: false,
+          error: `There is no Dish ID:${editDishInput.dishId}`,
+        };
+      }
+      if (owner.id !== dish.restaurant.ownerId) {
+        return {
+          ok: false,
+          error: `You don't have authority of edit`,
+        };
+      }
+      await this.dishes.save([
+        {
+          id: editDishInput.dishId,
+          ...editDishInput,
+        },
+      ]);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Could not edit dish' };
+    }
+  }
+  async deleteDish(
+    owner: Users,
+    { dishId }: DeleteDishesInput,
+  ): Promise<DeleteDishesOutput> {
+    try {
+      const dish = await this.dishes.findOne({
+        where: { id: dishId },
+        relations: [`restaurant`],
+      });
+      if (!dish) {
+        return {
+          ok: false,
+          error: `There is no Dish ID:${dishId}`,
+        };
+      }
+      if (owner.id !== dish.restaurant.ownerId) {
+        return {
+          ok: false,
+          error: `You don't have authority of delete`,
+        };
+      }
+      await this.dishes.delete(dishId);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: `Could not delete` };
     }
   }
 }
